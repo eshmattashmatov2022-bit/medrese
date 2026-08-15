@@ -4,10 +4,10 @@
    ===================================================== */
 
 :root {
-    --primary-color: #1E3A5F;
-    --secondary-color: #D4AF37;
-    --accent-color: #2E5C8A;
-    --light-bg: #F5F5DC;
+    --primary-color: #025517;
+    --secondary-color: #f3cc4c;
+    --accent-color: #f3db51cb;
+    --light-bg: #fcfcfc;
     --text-dark: #333333;
     --text-light: #666666;
     --border-color: #E0E0E0;
@@ -119,6 +119,12 @@ a:hover {
 }
 
 .logo svg {
+    display: block;
+}
+
+.logo-img {
+    height: 40px;
+    width: auto;
     display: block;
 }
 
