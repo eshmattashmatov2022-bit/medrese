@@ -34,6 +34,7 @@ const db = new sqlite3.Database(':memory:', (err) => {
 });
 
 function initializeDatabase() {
+    db.serialize(() => {
     // Admission submissions таблица
     db.run(`
         CREATE TABLE IF NOT EXISTS submissions (
@@ -87,6 +88,7 @@ function initializeDatabase() {
 
     // Инициализация пример данных
     seedDatabase();
+    });
 }
 
 function seedDatabase() {
