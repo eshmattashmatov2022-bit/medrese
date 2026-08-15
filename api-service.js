@@ -5,7 +5,7 @@
 
 const API_CONFIG = {
     // API базалык URL
-    BASE_URL: 'http://localhost:5001/api',
+    BASE_URL: 'http://localhost:5000/api',
     
     // API endpoints
     ENDPOINTS: {
