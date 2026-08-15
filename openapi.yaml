@@ -1,0 +1,619 @@
+openapi: 3.0.0
+info:
+  title: Медресе API
+  version: 1.0.0
+  description: Медресе веб-сайты үчүн REST API документациясы
+  contact:
+    name: Медресе Администрация
+    email: info@medrese.kg
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:5000
+    description: Локалдык сервер (Өндүрүш)
+  - url: https://api.medrese.kg
+    description: Боюнча сервер (Продакшн)
+
+tags:
+  - name: Health
+    description: Сервердин абалын текшеру
+  - name: Programs
+    description: Окуу программалары
+  - name: Teachers
+    description: Устаздар жана мугалимдер
+  - name: News
+    description: Жаңылыктар жана иш-чаралар
+  - name: Admission
+    description: Кабыл алуу формасы
+  - name: Submissions
+    description: Кабыл алуу заявкалары (админ)
+  - name: Statistics
+    description: Сайтын статистикасы
+
+paths:
+  /api/health:
+    get:
+      summary: Сервердин абалын текшеру
+      tags:
+        - Health
+      description: Сервер жоопсуз болгонун өндөрүш функциясы
+      responses:
+        '200':
+          description: Сервер иштеп жатат
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: OK
+                  message:
+                    type: string
+                    example: Сервер иштеп жатат
+
+  /api/programs:
+    get:
+      summary: Бардык окуу программаларды алуу
+      tags:
+        - Programs
+      description: Биздин сайтта сунушталган программалардын толук тизмесин алуу
+      responses:
+        '200':
+          description: Программалардын тизмеси
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Program'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/programs/{id}:
+    get:
+      summary: Биреи программаны алуу
+      tags:
+        - Programs
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Программанын уникалдуу ID
+      responses:
+        '200':
+          description: Программанын толук маалыматы
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Program'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/teachers:
+    get:
+      summary: Бардык устаздарды алуу
+      tags:
+        - Teachers
+      description: Сайтта иштейтүн мугалимдер жана устаздардын тизмесин алуу
+      responses:
+        '200':
+          description: Устаздардын тизмеси
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Teacher'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/teachers/{id}:
+    get:
+      summary: Биреи устазды алуу
+      tags:
+        - Teachers
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Устаздын уникалдуу ID
+      responses:
+        '200':
+          description: Устаздын толук маалыматы
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Teacher'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/news:
+    get:
+      summary: Жаңылыктар жана иш-чаралар
+      tags:
+        - News
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum:
+              - kabilaluu
+              - ishchara
+              - jetishkendik
+          description: Категория боюнча чыпкалоо (опционалдуу)
+      responses:
+        '200':
+          description: Жаңылыктардын тизмеси
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/News'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/news/{id}:
+    get:
+      summary: Биреи жаңылыктарды алуу
+      tags:
+        - News
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Жаңылыктын уникалдуу ID
+      responses:
+        '200':
+          description: Жаңылыктын толук маалыматы
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/News'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/admission:
+    post:
+      summary: Кабыл алуу формасын жиберүү
+      tags:
+        - Admission
+      description: Окуучу болуктарын медресеге кабыл алуу үчүн форма жиберүү
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmissionInput'
+            examples:
+              valid:
+                summary: Туура мисал
+                value:
+                  fullName: Ахмед Керим
+                  age: 15
+                  phone: "+996555123456"
+                  email: ahmed@example.com
+                  program: quran
+                  level: beginner
+                  message: Куран окугум келет
+
+      responses:
+        '201':
+          description: Форма ийгиликтүү жиберилди
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Форма ийгиликтүү жиберилди
+                  id:
+                    type: string
+                    example: 123e4567-e89b-12d3-a456-426614174000
+
+        '400':
+          description: Валидация ката - жоопсуз же туура эмес маалыматтар
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/submissions:
+    get:
+      summary: Бардык кабыл алуу заявкаларын алуу
+      tags:
+        - Submissions
+      description: Админ үчүн - бардык окуучу заявкаларын өндөрүшү
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum:
+              - pending
+              - approved
+              - rejected
+          description: Абалы боюнча чыпкалоо (опционалдуу)
+
+      responses:
+        '200':
+          description: Заявкалардын тизмеси
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Submission'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/submissions/{id}:
+    get:
+      summary: Биреи заявканы алуу
+      tags:
+        - Submissions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Заявканын уникалдуу ID
+
+      responses:
+        '200':
+          description: Заявканын толук маалыматы
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Submission'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/submissions/{id}/status:
+    patch:
+      summary: Заявканын абалын өзгөртүү
+      tags:
+        - Submissions
+      description: Админ үчүн - окуучу заявкасын макул же четинен кайтарса болот
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Заявканын уникалдуу ID
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - approved
+                    - rejected
+                  description: Жаңы абалы
+            examples:
+              approve:
+                summary: Макул болуну
+                value:
+                  status: approved
+              reject:
+                summary: Четинен кайтаруу
+                value:
+                  status: rejected
+
+      responses:
+        '200':
+          description: Абалы ийгиликтүү өзгөртүлдү
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Абалы өзгөртүлдү
+
+        '400':
+          description: Туура эмес абал
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Абалы туура эмес
+
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/statistics:
+    get:
+      summary: Сайтын статистикасы
+      tags:
+        - Statistics
+      description: Сайттын жалпы статистикасын алуу
+      responses:
+        '200':
+          description: Статистика маалыматтары
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Statistics'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  schemas:
+    Program:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Уникалдуу ID
+        name:
+          type: string
+          description: Программанын аты
+          example: Куран жаттоо
+        description:
+          type: string
+          description: Кыскача сүрөттөлүшү
+          example: Куранды толугу менен жаттоо программасы
+        icon:
+          type: string
+          description: Эмодзи же иконка
+          example: "📖"
+        duration:
+          type: string
+          description: Окуу мөөнөтү
+          example: "3-4 жыл"
+        details:
+          type: string
+          description: JSON форматындагы деталдар
+          example: '["Аңы-сезүүлүү окутуу", "Түжүндүүлүк жана орфография"]'
+
+    Teacher:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Уникалдуу ID
+        name:
+          type: string
+          description: Аты-жөнү
+          example: Шейх Мухаммад Али
+        specialty:
+          type: string
+          description: Адистеги
+          example: Куран жаттоо мугалими
+        bio:
+          type: string
+          description: Биография жана опыт
+          example: "20 жылдык тажрыйбасы"
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          description: Рейтинги
+          example: 5
+        avatar:
+          type: string
+          description: Араб символу же текст
+          example: "شيخ"
+
+    News:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Уникалдуу ID
+        title:
+          type: string
+          description: Заголовок
+          example: Жаңы окуучулар кабыл алуу башталды
+        content:
+          type: string
+          description: Мазмуну
+          example: Кыйын мейманкана деңгээлүү ийримдер үчүн кабыл алуу чакыруу чакырат
+        date:
+          type: string
+          format: date-time
+          description: Публикация датасы
+          example: "2024-08-14T00:00:00Z"
+        category:
+          type: string
+          enum:
+            - kabilaluu
+            - ishchara
+            - jetishkendik
+          description: Категория
+          example: kabilaluu
+
+    SubmissionInput:
+      type: object
+      required:
+        - fullName
+        - age
+        - phone
+        - program
+        - level
+      properties:
+        fullName:
+          type: string
+          minLength: 3
+          description: Толук аты-жөнү
+          example: Ахмед Керим
+        age:
+          type: integer
+          minimum: 5
+          maximum: 80
+          description: Жашы (5-80)
+          example: 15
+        phone:
+          type: string
+          pattern: '^\+?[\d\-\.\s\(\)]{10,}$'
+          description: Телефон номери
+          example: "+996555123456"
+        email:
+          type: string
+          format: email
+          description: Email адреси (опционалдуу)
+          example: ahmed@example.com
+        program:
+          type: string
+          enum:
+            - quran
+            - sharia
+            - arabic
+            - morality
+          description: Каалаган программа
+          example: quran
+        level:
+          type: string
+          enum:
+            - beginner
+            - intermediate
+            - advanced
+          description: Деңгээл
+          example: beginner
+        message:
+          type: string
+          description: Кошумча маалымат (опционалдуу)
+          example: Куран окугум келет
+
+    Submission:
+      allOf:
+        - $ref: '#/components/schemas/SubmissionInput'
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Уникалдуу ID
+            status:
+              type: string
+              enum:
+                - pending
+                - approved
+                - rejected
+              default: pending
+              description: Абалы
+              example: pending
+            createdAt:
+              type: string
+              format: date-time
+              description: Түзүлгөн убактысы
+              example: "2024-08-14T12:30:00Z"
+
+    Statistics:
+      type: object
+      properties:
+        totalSubmissions:
+          type: integer
+          description: Жалпы заявкалар саны
+          example: 42
+        approvedSubmissions:
+          type: integer
+          description: Макул болунган заявкалар саны
+          example: 38
+        totalTeachers:
+          type: integer
+          description: Устаздар саны
+          example: 4
+        totalPrograms:
+          type: integer
+          description: Программалар саны
+          example: 4
+
+    ValidationError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              param:
+                type: string
+                description: Ката болгон параметр
+              msg:
+                type: string
+                description: Ката сообщениесы
+          example:
+            - param: age
+              msg: Жашы 5-80 арасында болушу керек
+            - param: phone
+              msg: Телефон номери туура эмес
+
+  responses:
+    NotFound:
+      description: Ресурс табылган жок (404)
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Заявка табылган жок
+
+    InternalError:
+      description: Ички сервер катасы (500)
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Ички сервер катасы
+              message:
+                type: string
+                description: Ката деталдары (өндүрүш режимде гана)
+
+security:
+  - BearerAuth: []
+
+x-custom-info:
+  title: Медресе API
+  version: 1.0.0
+  description: Деңгээлүү ислам окуу жайы үчүн REST API
+  language: Kyrgyz
+  maintainer: Медресе Администрация
+  contact: info@medrese.kg

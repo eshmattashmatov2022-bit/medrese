@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Медресе - Деңгээлүү ислам билим берүүчүсүнүн сайты">
+    <title>Медресе - Деңгээлүү ислам билим берүүчүсү</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header/Navigation -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-wrapper">
+                    <div class="logo">
+                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                            <circle cx="20" cy="20" r="18" stroke="#D4AF37" stroke-width="2"/>
+                            <path d="M20 8v24M12 20h16" stroke="#1E3A5F" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="20" cy="20" r="3" fill="#D4AF37"/>
+                        </svg>
+                        <span>Медресе</span>
+                    </div>
+                    <button class="menu-toggle" id="menuToggle">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                    <ul class="nav-menu" id="navMenu">
+                        <li><a href="#home">Башкы</a></li>
+                        <li><a href="#about">Биз жөнүндө</a></li>
+                        <li><a href="#programs">Программалар</a></li>
+                        <li><a href="#teachers">Устаздар</a></li>
+                        <li><a href="#gallery">Галерея</a></li>
+                        <li><a href="#news">Жаңылыктар</a></li>
+                        <li><a href="#contact">Байланыш</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="geometric-pattern top-left"></div>
+        <div class="geometric-pattern bottom-right"></div>
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Баарындан ыйык билим</h1>
+                <p class="hero-subtitle">Ислам окутуу жайында студенттер үчүн жогорку сапаттагы деңгээлүү билим берүү</p>
+                <div class="hero-buttons">
+                    <a href="#admission" class="btn btn-primary">Кабыл алууга тез жөнөө</a>
+                    <a href="#about" class="btn btn-secondary">Көбүрөөк билүү</a>
+                </div>
+            </div>
+            <div class="hero-stats">
+                <div class="stat">
+                    <h3>500+</h3>
+                    <p>Окуучулар</p>
+                </div>
+                <div class="stat">
+                    <h3>25+</h3>
+                    <p>Устаздар</p>
+                </div>
+                <div class="stat">
+                    <h3>15+</h3>
+                    <p>Жылдар тажрыйба</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="container">
+            <div class="section-header">
+                <h2>Биз жөнүндө</h2>
+                <div class="ornament"></div>
+            </div>
+            <div class="about-content">
+                <div class="about-text">
+                    <h3>Биздин миссиясы</h3>
+                    <p>Медресе - бул баалуу ислам маданиятын сакталап, жана түлүктү ырымдуу жана окумуштуу мүсүлмандарга айландыруу максатында иштейтүн бир таарыхый жана улуттук окуу жайы.</p>
+                    <p>Биз окуучуларга Куран окутуу, Шариат жана Араб тилин оогун сапаттуу масал-мисалдар аркылуу окутабыз. Биздин устаздар окуучулардын жүрөк-аң-сезимин өндүрүүгө багытталган, социалдык жана дүйнөлүк кыйынчылыктарга чыдамдуу болсун деп окутабыз.</p>
+                    <ul class="about-features">
+                        <li>✓ Куранды толугу менен жаттоо программасы</li>
+                        <li>✓ Шариат жана исламдык окушуу</li>
+                        <li>✓ Араб тили жана грамматика</li>
+                        <li>✓ Исламдык дүйнө-карашы</li>
+                        <li>✓ Адеп жана ахлак окушуу</li>
+                    </ul>
+                </div>
+                <div class="about-image">
+                    <div class="placeholder-image">
+                        <svg viewBox="0 0 300 300" fill="none">
+                            <rect width="300" height="300" fill="#F5F5DC"/>
+                            <circle cx="150" cy="100" r="40" fill="#D4AF37" opacity="0.3"/>
+                            <path d="M100 200 L150 150 L200 200 Z" fill="#1E3A5F" opacity="0.2"/>
+                            <circle cx="60" cy="250" r="20" fill="#D4AF37" opacity="0.2"/>
+                            <circle cx="240" cy="260" r="15" fill="#1E3A5F" opacity="0.2"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Programs Section -->
+    <section class="programs" id="programs">
+        <div class="container">
+            <div class="section-header">
+                <h2>Окуу Программалары</h2>
+                <div class="ornament"></div>
+            </div>
+            <div class="programs-grid">
+                <div class="program-card">
+                    <div class="program-icon">📖</div>
+                    <h3>Куран жаттоо</h3>
+                    <p>Куранды толугу менен жаттоо программасы. Мөөнөтү 3-4 жыл.</p>
+                    <ul class="program-details">
+                        <li>Аңы-сезүүлүү окутуу</li>
+                        <li>Түжүндүүлүк жана орфография</li>
+                        <li>Таджвид (окуу сынап)</li>
+                    </ul>
+                </div>
+
+                <div class="program-card">
+                    <div class="program-icon">⚖️</div>
+                    <h3>Шариат Жана Фикх</h3>
+                    <p>Исламдык мыйзамчылык жана практикалык учендиктердин окутуу.</p>
+                    <ul class="program-details">
+                        <li>Исламдык мыйзамчылык (Фикх)</li>
+                        <li>Адатка туруктуу чыгыштар</li>
+                        <li>Ибадат жана этикасы</li>
+                    </ul>
+                </div>
+
+                <div class="program-card">
+                    <div class="program-icon">🗣️</div>
+                    <h3>Араб Тили</h3>
+                    <p>Караб түнүнүн окутуу, грамматикасы жана адабияты.</p>
+                    <ul class="program-details">
+                        <li>Араб грамматикасы</li>
+                        <li>Макала окушуу</li>
+                        <li>Диалог жана сүйлөө</li>
+                    </ul>
+                </div>
+
+                <div class="program-card">
+                    <div class="program-icon">💚</div>
+                    <h3>Адеп Жана Ахлак</h3>
+                    <p>Ырымдуу жана адептүү жашоо образы окутуу.</p>
+                    <ul class="program-details">
+                        <li>Исламдык адебиятты</li>
+                        <li>Ахлак жана этика</li>
+                        <li>Коомчулук ишмерчилиги</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Teachers Section -->
+    <section class="teachers" id="teachers">
+        <div class="container">
+            <div class="section-header">
+                <h2>Биздин Устаздар</h2>
+                <div class="ornament"></div>
+            </div>
+            <div class="teachers-grid">
+                <div class="teacher-card">
+                    <div class="teacher-avatar">شيخ</div>
+                    <h3>Шейх Мухаммад Али</h3>
+                    <p class="teacher-specialty">Куран жаттоо мугалими</p>
+                    <p class="teacher-bio">20 жылдык тажрыйбасы. Алынган орундубу бир нечей окуучулары.</p>
+                    <div class="teacher-rating">⭐⭐⭐⭐⭐</div>
+                </div>
+
+                <div class="teacher-card">
+                    <div class="teacher-avatar">د</div>
+                    <h3>Доктор Фаруқ Исмаил</h3>
+                    <p class="teacher-specialty">Шариат жана Фикх</p>
+                    <p class="teacher-bio">Медина Университетинен окуган, 15 жылдык опыты бар.</p>
+                    <div class="teacher-rating">⭐⭐⭐⭐⭐</div>
+                </div>
+
+                <div class="teacher-card">
+                    <div class="teacher-avatar">أ</div>
+                    <h3>Ахмад Сафуллин</h3>
+                    <p class="teacher-specialty">Араб Тили жана Грамматика</p>
+                    <p class="teacher-bio">Араб тилинин профессионалы, интерактивдүү окутуу методу.</p>
+                    <div class="teacher-rating">⭐⭐⭐⭐☆</div>
+                </div>
+
+                <div class="teacher-card">
+                    <div class="teacher-avatar">ن</div>
+                    <h3>Наталия Исмакова</h3>
+                    <p class="teacher-specialty">Адеп жана Психология</p>
+                    <p class="teacher-bio">Психолог жана педагог, окуучулардын өндөрүшүндө адистеш.</p>
+                    <div class="teacher-rating">⭐⭐⭐⭐⭐</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="gallery" id="gallery">
+        <div class="container">
+            <div class="section-header">
+                <h2>Галерея</h2>
+                <div class="ornament"></div>
+            </div>
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <div class="gallery-image placeholder"></div>
+                    <p>Окуу сабактары</p>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-image placeholder"></div>
+                    <p>Студенттер жыйнагы</p>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-image placeholder"></div>
+                    <p>Кутулуу иш-чара</p>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-image placeholder"></div>
+                    <p>Кытаптар салу</p>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-image placeholder"></div>
+                    <p>Спорт мероприятиялар</p>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-image placeholder"></div>
+                    <p>Коомчулук иши</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- News Section -->
+    <section class="news" id="news">
+        <div class="container">
+            <div class="section-header">
+                <h2>Жаңылыктар жана Иш-Чаралар</h2>
+                <div class="ornament"></div>
+            </div>
+            <div class="news-grid">
+                <article class="news-card">
+                    <div class="news-date">
+                        <span class="day">14</span>
+                        <span class="month">АУГ</span>
+                    </div>
+                    <div class="news-content">
+                        <h3>Жаңы окуучулар кабыл алуу башталды</h3>
+                        <p>Кыйын мейманкана деңгээлүү ийримдер үчүн кабыл алуу чакыруу чакырат. Барлык курстарга орун бар.</p>
+                        <a href="#" class="read-more">Көбүрөөк →</a>
+                    </div>
+                </article>
+
+                <article class="news-card">
+                    <div class="news-date">
+                        <span class="day">10</span>
+                        <span class="month">АУГ</span>
+                    </div>
+                    <div class="news-content">
+                        <h3>Раматан жарыягы жана тәндіктігі</h3>
+                        <p>Раматан ая куттуу иш-чара 25-августта болот. Бул салтанаттуу сыкта таң-көртүө болмок.</p>
+                        <a href="#" class="read-more">Көбүрөөк →</a>
+                    </div>
+                </article>
+
+                <article class="news-card">
+                    <div class="news-date">
+                        <span class="day">05</span>
+                        <span class="month">АУГ</span>
+                    </div>
+                    <div class="news-content">
+                        <h3>Окуучулардын жетишкендиктери</h3>
+                        <p>Биздин 5 окуучу Куранды толугу менен жаттап, сертификат алышты. Аларга ыраажыбыз!</p>
+                        <a href="#" class="read-more">Көбүрөөк →</a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Achievements Section -->
+    <section class="achievements" id="achievements">
+        <div class="container">
+            <div class="section-header">
+                <h2>Окуучулардын Жетишкендиктери</h2>
+                <div class="ornament"></div>
+            </div>
+            <div class="achievements-grid">
+                <div class="achievement-item">
+                    <div class="achievement-icon">🏆</div>
+                    <h3>150+</h3>
+                    <p>Куранды толугу менен жаттаган</p>
+                </div>
+                <div class="achievement-item">
+                    <div class="achievement-icon">📚</div>
+                    <h3>50+</h3>
+                    <p>Фикх курсун толуктаган</p>
+                </div>
+                <div class="achievement-item">
+                    <div class="achievement-icon">🎯</div>
+                    <h3>200+</h3>
+                    <p>Араб тилин окуган</p>
+                </div>
+                <div class="achievement-item">
+                    <div class="achievement-icon">🌟</div>
+                    <h3>300+</h3>
+                    <p>Адеп курсун толуктаган</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admission Section -->
+    <section class="admission" id="admission">
+        <div class="container">
+            <div class="section-header">
+                <h2>Кабыл Алуу Формасы</h2>
+                <div class="ornament"></div>
+            </div>
+            <div class="admission-content">
+                <p class="admission-intro">Медресеге окуч тилебеген окуучулар үчүн төмөндөгү форма толтуруңуз. Биз сизге тез жооп беребиз.</p>
+                <form class="admission-form" id="admissionForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fullName">Толук аты-жөнү *</label>
+                            <input type="text" id="fullName" name="fullName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="age">Жашы *</label>
+                            <input type="number" id="age" name="age" min="5" max="80" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone">Телефон номери *</label>
+                            <input type="tel" id="phone" name="phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email адреси</label>
+                            <input type="email" id="email" name="email">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="program">Каалаган программа *</label>
+                            <select id="program" name="program" required>
+                                <option value="">Тандаңыз...</option>
+                                <option value="quran">Куран жаттоо</option>
+                                <option value="sharia">Шариат жана Фикх</option>
+                                <option value="arabic">Араб тили</option>
+                                <option value="morality">Адеп жана Ахлак</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="level">Деңгээл *</label>
+                            <select id="level" name="level" required>
+                                <option value="">Тандаңыз...</option>
+                                <option value="beginner">Башталгыч</option>
+                                <option value="intermediate">Орто</option>
+                                <option value="advanced">Прогрессивдүү</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="message">Кошумча маалымат</label>
+                        <textarea id="message" name="message" rows="4" placeholder="Эгерде окуучу жөнүндө кошумча маалымат болсо жазыңыз..."></textarea>
+                    </div>
+
+                    <div class="form-group checkbox">
+                        <input type="checkbox" id="agree" name="agree" required>
+                        <label for="agree">Биздин Шарттар жана Жеке Маалыматтар Сохранение Саясатына макул болом *</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary full-width">Формасын жөнөтүү</button>
+                    <div class="form-message" id="formMessage"></div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2>Бизге Байланышыңыз</h2>
+                <div class="ornament"></div>
+            </div>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <div class="contact-icon">📍</div>
+                        <div class="contact-details">
+                            <h3>Дарек</h3>
+                            <p>Бишкек ш., Айтматов курч., 45-үй</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-icon">📞</div>
+                        <div class="contact-details">
+                            <h3>Телефон</h3>
+                            <p>+996 (312) 123-45-67</p>
+                            <p>+996 (555) 987-65-43</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-icon">✉️</div>
+                        <div class="contact-details">
+                            <h3>Email</h3>
+                            <p><a href="mailto:info@medrese.kg">info@medrese.kg</a></p>
+                            <p><a href="mailto:admission@medrese.kg">admission@medrese.kg</a></p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-icon">🕐</div>
+                        <div class="contact-details">
+                            <h3>Иштөө Убактысы</h3>
+                            <p>Понедельник - Жума: 08:00 - 18:00</p>
+                            <p>Шемби - Жекшемби: 10:00 - 16:00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-social">
+                    <h3>Социалдык Тармактар</h3>
+                    <div class="social-links">
+                        <a href="#" class="social-link facebook" title="Facebook">f</a>
+                        <a href="#" class="social-link instagram" title="Instagram">📷</a>
+                        <a href="#" class="social-link telegram" title="Telegram">✈️</a>
+                        <a href="#" class="social-link youtube" title="YouTube">▶️</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Map Placeholder -->
+            <div class="map-container">
+                <div class="map-placeholder">
+                    <p>🗺️ Google Maps интеграциясы</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Медресе</h4>
+                    <p>Деңгээлүү ислам окуу жайы. Бассейн жана уютуу шарттарда окутуу.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Сайттан</h4>
+                    <ul>
+                        <li><a href="#programs">Программалар</a></li>
+                        <li><a href="#teachers">Устаздар</a></li>
+                        <li><a href="#admission">Кабыл алуу</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Маалымат</h4>
+                    <ul>
+                        <li><a href="#">Жеке маалыматтар саясаты</a></li>
+                        <li><a href="#">Пайдалану шарттары</a></li>
+                        <li><a href="#">Сайт Карта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Медресе. Бардык укуктар сакталган. | Сайт <a href="#">GitHub Copilot</a> тарабынан түзүлдү.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="api-service.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
