@@ -14,15 +14,15 @@ const { v4: uuidv4 } = require('uuid');
 const sqlite3 = require('sqlite3').verbose();
 const { body, validationResult } = require('express-validator');
 require('dotenv').config();
-
+const path = require('path');
 const app = express();
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5000;
 
 // ===== MIDDLEWARE =====
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
+app.use(express.static(__dirname));
 // ===== DATABASE ИНИЦИАЛИЗАЦИЯ =====
 const db = new sqlite3.Database(':memory:', (err) => {
     if (err) {
@@ -34,61 +34,59 @@ const db = new sqlite3.Database(':memory:', (err) => {
 });
 
 function initializeDatabase() {
-    db.serialize(() => {
-        // Admission submissions таблица
-        db.run(`
-            CREATE TABLE IF NOT EXISTS submissions (
-                id TEXT PRIMARY KEY,
-                fullName TEXT NOT NULL,
-                age INTEGER NOT NULL,
-                phone TEXT NOT NULL,
-                email TEXT,
-                program TEXT NOT NULL,
-                level TEXT NOT NULL,
-                message TEXT,
-                status TEXT DEFAULT 'pending',
-                createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-            )
-        `);
+    // Admission submissions таблица
+    db.run(`
+        CREATE TABLE IF NOT EXISTS submissions (
+            id TEXT PRIMARY KEY,
+            fullName TEXT NOT NULL,
+            age INTEGER NOT NULL,
+            phone TEXT NOT NULL,
+            email TEXT,
+            program TEXT NOT NULL,
+            level TEXT NOT NULL,
+            message TEXT,
+            status TEXT DEFAULT 'pending',
+            createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
 
-        // Programs таблица
-        db.run(`
-            CREATE TABLE IF NOT EXISTS programs (
-                id TEXT PRIMARY KEY,
-                name TEXT NOT NULL,
-                description TEXT,
-                icon TEXT,
-                duration TEXT,
-                details TEXT
-            )
-        `);
+    // Programs таблица
+    db.run(`
+        CREATE TABLE IF NOT EXISTS programs (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            description TEXT,
+            icon TEXT,
+            duration TEXT,
+            details TEXT
+        )
+    `);
 
-        // Teachers таблица
-        db.run(`
-            CREATE TABLE IF NOT EXISTS teachers (
-                id TEXT PRIMARY KEY,
-                name TEXT NOT NULL,
-                specialty TEXT NOT NULL,
-                bio TEXT,
-                rating INTEGER,
-                avatar TEXT
-            )
-        `);
+    // Teachers таблица
+    db.run(`
+        CREATE TABLE IF NOT EXISTS teachers (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            specialty TEXT NOT NULL,
+            bio TEXT,
+            rating INTEGER,
+            avatar TEXT
+        )
+    `);
 
-        // News таблица
-        db.run(`
-            CREATE TABLE IF NOT EXISTS news (
-                id TEXT PRIMARY KEY,
-                title TEXT NOT NULL,
-                content TEXT,
-                date DATETIME,
-                category TEXT
-            )
-        `);
+    // News таблица
+    db.run(`
+        CREATE TABLE IF NOT EXISTS news (
+            id TEXT PRIMARY KEY,
+            title TEXT NOT NULL,
+            content TEXT,
+            date DATETIME,
+            category TEXT
+        )
+    `);
 
-        // Инициализация пример данных
-        seedDatabase();
-    });
+    // Инициализация пример данных
+    seedDatabase();
 }
 
 function seedDatabase() {
@@ -341,18 +339,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *     responses:
  *       200:
  *         description: Сервер иштеп жатат
- *   head:
- *     summary: Сервердин заголовоктарын текшеру
- *     tags: [Health]
- *     responses:
- *       200:
- *         description: Заголовоктар бар
- *   options:
- *     summary: Сервер тарабынан колдоо бар HTTP ыктымал методдорун текшеру
- *     tags: [Health]
- *     responses:
- *       200:
- *         description: HTTP ыктымал методдорду кайтарат
  */
 app.get('/api/health', (req, res) => {
     res.json({ status: 'OK', message: 'Сервер иштеп жатат' });
@@ -623,75 +609,6 @@ app.get('/api/submissions', (req, res) => {
  *         required: true
  *         schema:
  *           type: string
- *   put:
- *     summary: Заявканын маалыматтарын жаңыртуу
- *     tags: [Submissions]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               fullName:
- *                 type: string
- *               age:
- *                 type: integer
- *               phone:
- *                 type: string
- *               email:
- *                 type: string
- *               program:
- *                 type: string
- *               level:
- *                 type: string
- *               message:
- *                 type: string
- *     responses:
- *       200:
- *         description: Заявка жаңыртылды
- *   delete:
- *     summary: Заявканы өчүрүү
- *     tags: [Submissions]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Заявка өчүрүлдү
- *   head:
- *     summary: Заявка ресурси боюнча header маалыматтарды текшеру
- *     tags: [Submissions]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Header маалыматтары бар
- *   options:
- *     summary: Заявка ресурси боюнча колдоого алынган HTTP методдорун текшеру
- *     tags: [Submissions]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: HTTP методдордун тизмеси кайтарылат
  */
 app.get('/api/submissions/:id', (req, res) => {
     db.get('SELECT * FROM submissions WHERE id = ?', [req.params.id], (err, row) => {
@@ -789,6 +706,14 @@ app.use((err, req, res, next) => {
         error: 'Ички сервер катасы',
         message: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
+});
+
+// Статикалык файлдарды (HTML, CSS, JS) тейлөө
+app.use(express.static(__dirname));
+
+// Баш баракты көрсөтүү
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // 404 Handler
