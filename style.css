@@ -122,6 +122,12 @@ a:hover {
     display: block;
 }
 
+.logo-img {
+    height: 40px;
+    width: auto;
+    display: block;
+}
+
 .nav-menu {
     display: flex;
     list-style: none;
