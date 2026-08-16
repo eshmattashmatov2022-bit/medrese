@@ -3,14 +3,19 @@
   "builds": [
     {
       "src": "server.js",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "index.html",
+          "style.css",
+          "script.js",
+          "api-service.js",
+          "images/**"
+        ]
+      }
     }
   ],
   "routes": [
-    {
-      "src": "/(.*\\.(css|js|png|jpg|jpeg|svg|ico|gif))",
-      "dest": "/$1"
-    },
     {
       "src": "/(.*)",
       "dest": "server.js"
