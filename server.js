@@ -14,15 +14,44 @@ const { v4: uuidv4 } = require('uuid');
 const sqlite3 = require('sqlite3').verbose();
 const { body, validationResult } = require('express-validator');
 require('dotenv').config();
+const multer = require('multer');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Сүрөт жүктөө конфигурациясы
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/');
+    },
+    filename: function (req, file, cb) {
+        const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1e9) + path.extname(file.originalname);
+        cb(null, uniqueName);
+    }
+});
+
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: function (req, file, cb) {
+        const allowedTypes = /jpeg|jpg|png|gif|webp/;
+        const isValid = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+        if (isValid) {
+            cb(null, true);
+        } else {
+            cb(new Error('Сүрөт файлы гана кабыл алынат (jpg, png, gif, webp)'));
+        }
+    }
+});
 
 // ===== MIDDLEWARE =====
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
+app.use('/uploads', express.static('uploads'));
 // ===== DATABASE ИНИЦИАЛИЗАЦИЯ =====
 const db = new sqlite3.Database(':memory:', (err) => {
     if (err) {
@@ -82,7 +111,8 @@ function initializeDatabase() {
             title TEXT NOT NULL,
             content TEXT,
             date DATETIME,
-            category TEXT
+            category TEXT,
+            image TEXT
         )
     `);
 
@@ -716,6 +746,173 @@ app.use(express.static(__dirname));
 // Баш баракты көрсөтүү
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
+});
+// ===== АДМИН АВТОРИЗАЦИЯСЫ =====
+
+// Админ кирүү (login)
+app.post('/api/admin/login', (req, res) => {
+    const { password } = req.body;
+
+    if (!password) {
+        return res.status(400).json({ error: 'Сырсөз керек' });
+    }
+
+    if (password !== process.env.ADMIN_PASSWORD) {
+        return res.status(401).json({ error: 'Сырсөз туура эмес' });
+    }
+
+    const token = jwt.sign(
+        { role: 'admin' },
+        process.env.JWT_SECRET,
+        { expiresIn: '24h' }
+    );
+
+    res.json({ token, message: 'Ийгиликтүү кирдиңиз' });
+});
+
+// Токенди текшерүүчү middleware
+function verifyAdminToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ error: 'Токен жок, кирүү керек' });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(403).json({ error: 'Токен жараксыз же мөөнөтү бүткөн' });
+        }
+        req.admin = decoded;
+        next();
+    });
+}
+
+// Токенди текшерүү endpoint (админ панель ачылганда колдонулат)
+app.get('/api/admin/verify', verifyAdminToken, (req, res) => {
+    res.json({ valid: true });
+});
+// ===== СҮРӨТ ЖҮКТӨӨ =====
+
+app.post('/api/upload', verifyAdminToken, upload.single('image'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'Сүрөт файлы жиберилген жок' });
+    }
+    const imageUrl = `/uploads/${req.file.filename}`;
+    res.json({ url: imageUrl, message: 'Сүрөт ийгиликтүү жүктөлдү' });
+});
+// ===== PROGRAMS ADMIN CRUD =====
+
+app.post('/api/programs', verifyAdminToken, (req, res) => {
+    const { name, description, icon, duration, details } = req.body;
+    const id = uuidv4();
+
+    db.run(
+        `INSERT INTO programs (id, name, description, icon, duration, details) VALUES (?, ?, ?, ?, ?, ?)`,
+        [id, name, description, icon, duration, JSON.stringify(details || [])],
+        function(err) {
+            if (err) return res.status(500).json({ error: err.message });
+            res.status(201).json({ id, message: 'Программа кошулду' });
+        }
+    );
+});
+
+app.put('/api/programs/:id', verifyAdminToken, (req, res) => {
+    const { name, description, icon, duration, details } = req.body;
+
+    db.run(
+        `UPDATE programs SET name=?, description=?, icon=?, duration=?, details=? WHERE id=?`,
+        [name, description, icon, duration, JSON.stringify(details || []), req.params.id],
+        function(err) {
+            if (err) return res.status(500).json({ error: err.message });
+            if (this.changes === 0) return res.status(404).json({ error: 'Программа табылган жок' });
+            res.json({ message: 'Программа өзгөртүлдү' });
+        }
+    );
+});
+
+app.delete('/api/programs/:id', verifyAdminToken, (req, res) => {
+    db.run(`DELETE FROM programs WHERE id=?`, [req.params.id], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+        if (this.changes === 0) return res.status(404).json({ error: 'Программа табылган жок' });
+        res.json({ message: 'Программа өчүрүлдү' });
+    });
+});
+
+// ===== TEACHERS ADMIN CRUD =====
+
+app.post('/api/teachers', verifyAdminToken, (req, res) => {
+    const { name, specialty, bio, rating, avatar } = req.body;
+    const id = uuidv4();
+
+    db.run(
+        `INSERT INTO teachers (id, name, specialty, bio, rating, avatar) VALUES (?, ?, ?, ?, ?, ?)`,
+        [id, name, specialty, bio, rating, avatar],
+        function(err) {
+            if (err) return res.status(500).json({ error: err.message });
+            res.status(201).json({ id, message: 'Устаз кошулду' });
+        }
+    );
+});
+
+app.put('/api/teachers/:id', verifyAdminToken, (req, res) => {
+    const { name, specialty, bio, rating, avatar } = req.body;
+
+    db.run(
+        `UPDATE teachers SET name=?, specialty=?, bio=?, rating=?, avatar=? WHERE id=?`,
+        [name, specialty, bio, rating, avatar, req.params.id],
+        function(err) {
+            if (err) return res.status(500).json({ error: err.message });
+            if (this.changes === 0) return res.status(404).json({ error: 'Устаз табылган жок' });
+            res.json({ message: 'Устаз өзгөртүлдү' });
+        }
+    );
+});
+
+app.delete('/api/teachers/:id', verifyAdminToken, (req, res) => {
+    db.run(`DELETE FROM teachers WHERE id=?`, [req.params.id], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+        if (this.changes === 0) return res.status(404).json({ error: 'Устаз табылган жок' });
+        res.json({ message: 'Устаз өчүрүлдү' });
+    });
+});
+
+// ===== NEWS ADMIN CRUD =====
+
+app.post('/api/news', verifyAdminToken, (req, res) => {
+    const { title, content, date, category, image } = req.body;
+    const id = uuidv4();
+
+    db.run(
+        `INSERT INTO news (id, title, content, date, category, image) VALUES (?, ?, ?, ?, ?, ?)`,
+        [id, title, content, date || new Date().toISOString(), category, image],
+        function(err) {
+            if (err) return res.status(500).json({ error: err.message });
+            res.status(201).json({ id, message: 'Жаңылык кошулду' });
+        }
+    );
+});
+
+app.put('/api/news/:id', verifyAdminToken, (req, res) => {
+    const { title, content, date, category, image } = req.body;
+
+    db.run(
+        `UPDATE news SET title=?, content=?, date=?, category=?, image=? WHERE id=?`,
+        [title, content, date, category, image, req.params.id],
+        function(err) {
+            if (err) return res.status(500).json({ error: err.message });
+            if (this.changes === 0) return res.status(404).json({ error: 'Жаңылык табылган жок' });
+            res.json({ message: 'Жаңылык өзгөртүлдү' });
+        }
+    );
+});
+
+app.delete('/api/news/:id', verifyAdminToken, (req, res) => {
+    db.run(`DELETE FROM news WHERE id=?`, [req.params.id], function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+        if (this.changes === 0) return res.status(404).json({ error: 'Жаңылык табылган жок' });
+        res.json({ message: 'Жаңылык өчүрүлдү' });
+    });
 });
 
 // 404 Handler

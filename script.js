@@ -335,3 +335,86 @@ window.medrese = {
 
 console.log('%c🕌 Добро пожаловать на сайт Медресе!', 'color: #D4AF37; font-size: 18px; font-weight: bold;');
 console.log('%cДоступные команды: window.medrese', 'color: #1E3A5F; font-size: 12px;');
+
+// ===== ЖАҢЫЛЫКТАРДЫ API'ДЕН ЖҮКТӨӨ =====
+async function loadNewsFromAPI() {
+    try {
+        const response = await fetch('/api/news');
+        const result = await response.json();
+        const newsList = result.data || result || [];
+
+        const newsGrid = document.getElementById('newsGrid');
+
+        if (!newsList.length) {
+            newsGrid.innerHTML = '<p>Азырынча жаңылык жок</p>';
+            return;
+        }
+
+        window.allNewsData = newsList;
+
+        newsGrid.innerHTML = newsList.map((news, index) => {
+            const date = new Date(news.date);
+            const day = date.getDate().toString().padStart(2, '0');
+            const months = ['ЯНВ','ФЕВ','МАРТ','АПР','МАЙ','ИЮН','ИЮЛ','АВГ','СЕН','ОКТ','НОЯ','ДЕК'];
+            const month = months[date.getMonth()] || 'АВГ';
+
+            const imageHtml = news.image
+                ? `<img src="${news.image}" alt="${news.title}" style="width:100%;height:180px;object-fit:cover;border-radius:8px;margin-bottom:12px;">`
+                : '';
+
+            return `
+                <article class="news-card">
+                    <div class="news-date">
+                        <span class="day">${day}</span>
+                        <span class="month">${month}</span>
+                    </div>
+                    <div class="news-content">
+                        ${imageHtml}
+                        <h3>${news.title}</h3>
+                        <p>${(news.content || '').substring(0, 200)}...</p>
+                        <a href="javascript:void(0)" class="read-more" onclick="openNewsModal(${index})">Көбүрөөк →</a>
+                    </div>
+                </article>
+            `;
+        }).join('');
+
+    } catch (error) {
+        console.error('Жаңылыктарды жүктөөдө ката:', error);
+        document.getElementById('newsGrid').innerHTML = '<p>Жаңылыктарды жүктөө мүмкүн болгон жок</p>';
+    }
+}
+
+function openNewsModal(index) {
+    const news = window.allNewsData[index];
+    if (!news) return;
+
+    let modal = document.getElementById('newsDetailModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'newsDetailModal';
+        modal.style.cssText = 'display:flex;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;z-index:9999;padding:20px;';
+        modal.innerHTML = `
+            <div style="background:white;max-width:600px;width:100%;max-height:85vh;overflow-y:auto;border-radius:10px;padding:25px;position:relative;">
+                <button onclick="document.getElementById('newsDetailModal').style.display='none'" style="position:absolute;top:15px;right:15px;background:none;border:none;font-size:24px;cursor:pointer;">×</button>
+                <div id="newsModalContent"></div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    const imageHtml = news.image
+        ? `<img src="${news.image}" style="width:100%;border-radius:8px;margin-bottom:15px;">`
+        : '';
+
+    document.getElementById('newsModalContent').innerHTML = `
+        ${imageHtml}
+        <h2 style="margin-bottom:10px;">${news.title}</h2>
+        <p style="color:#888;margin-bottom:15px;font-size:14px;">${new Date(news.date).toLocaleDateString('ky-KG')} ${news.category ? '· ' + news.category : ''}</p>
+        <p style="line-height:1.6;">${news.content}</p>
+    `;
+
+    modal.style.display = 'flex';
+}
+
+// Барак жүктөлгөндө жаңылыктарды алуу
+document.addEventListener('DOMContentLoaded', loadNewsFromAPI);

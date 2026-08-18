@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+<meta charset="UTF-8">
+<title>Админ панель - Медресе</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f4f4f4; }
+
+    /* Login экраны */
+    #loginScreen {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+    }
+    .login-box {
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        width: 320px;
+    }
+    .login-box h2 { margin-bottom: 20px; color: #1E3A5F; text-align: center; }
+    .login-box input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    .login-box button {
+        width: 100%;
+        padding: 10px;
+        background: #1E3A5F;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    .error-msg { color: red; margin-bottom: 10px; font-size: 14px; }
+
+    /* Админ панель */
+    #adminPanel { display: none; }
+    .navbar {
+        background: #1E3A5F;
+        color: white;
+        padding: 15px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .navbar button {
+        background: #D4AF37;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .tabs {
+        display: flex;
+        gap: 10px;
+        padding: 15px 30px;
+        background: white;
+        border-bottom: 1px solid #ddd;
+    }
+    .tab-btn {
+        padding: 10px 20px;
+        border: none;
+        background: #eee;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .tab-btn.active { background: #1E3A5F; color: white; }
+    .content { padding: 30px; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+    }
+    th, td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+        font-size: 14px;
+    }
+    th { background: #f8f8f8; }
+    .btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; margin-right: 5px; font-size: 13px; }
+    .btn-edit { background: #4CAF50; color: white; }
+    .btn-delete { background: #e74c3c; color: white; }
+    .btn-add { background: #1E3A5F; color: white; padding: 10px 20px; margin-bottom: 15px; }
+    .status-pending { color: orange; font-weight: bold; }
+    .status-approved { color: green; font-weight: bold; }
+    .status-rejected { color: red; font-weight: bold; }
+
+    /* Modal */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.5);
+        align-items: center;
+        justify-content: center;
+    }
+    .modal.active { display: flex; }
+    .modal-box {
+        background: white;
+        padding: 25px;
+        border-radius: 8px;
+        width: 400px;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    .modal-box h3 { margin-bottom: 15px; }
+    .modal-box input, .modal-box textarea {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    .modal-actions { display: flex; gap: 10px; margin-top: 10px; }
+    .modal-actions button { flex: 1; padding: 10px; border: none; border-radius: 5px; cursor: pointer; }
+    .save-btn { background: #1E3A5F; color: white; }
+    .cancel-btn { background: #ccc; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN ЭКРАНЫ -->
+<div id="loginScreen">
+    <div class="login-box">
+        <h2>Админ Панель</h2>
+        <div id="loginError" class="error-msg"></div>
+        <input type="password" id="passwordInput" placeholder="Сырсөз">
+        <button onclick="login()">Кирүү</button>
+    </div>
+</div>
+
+<!-- АДМИН ПАНЕЛЬ -->
+<div id="adminPanel">
+    <div class="navbar">
+        <h2>Медресе Админ Панели</h2>
+        <button onclick="logout()">Чыгуу</button>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('submissions')">Арыздар</button>
+        <button class="tab-btn" onclick="switchTab('programs')">Программалар</button>
+        <button class="tab-btn" onclick="switchTab('teachers')">Устаздар</button>
+        <button class="tab-btn" onclick="switchTab('news')">Жаңылыктар</button>
+    </div>
+
+    <div class="content">
+
+        <!-- АРЫЗДАР -->
+        <div id="submissions" class="tab-content active">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Аты-жөнү</th><th>Жашы</th><th>Телефон</th><th>Программа</th><th>Статус</th><th>Аракет</th>
+                    </tr>
+                </thead>
+                <tbody id="submissionsTable"></tbody>
+            </table>
+        </div>
+
+        <!-- ПРОГРАММАЛАР -->
+        <div id="programs" class="tab-content">
+            <button class="btn btn-add" onclick="openModal('programs')">+ Жаңы программа</button>
+            <table>
+                <thead><tr><th>Аты</th><th>Мөөнөтү</th><th>Сүрөттөмө</th><th>Аракет</th></tr></thead>
+                <tbody id="programsTable"></tbody>
+            </table>
+        </div>
+
+        <!-- УСТАЗДАР -->
+        <div id="teachers" class="tab-content">
+            <button class="btn btn-add" onclick="openModal('teachers')">+ Жаңы устаз</button>
+            <table>
+                <thead><tr><th>Аты</th><th>Адистиги</th><th>Аракет</th></tr></thead>
+                <tbody id="teachersTable"></tbody>
+            </table>
+        </div>
+
+        <!-- ЖАҢЫЛЫКТАР -->
+        <div id="news" class="tab-content">
+            <button class="btn btn-add" onclick="openModal('news')">+ Жаңы жаңылык</button>
+            <table>
+                <thead><tr><th>Аталышы</th><th>Категория</th><th>Аракет</th></tr></thead>
+                <tbody id="newsTable"></tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<!-- MODAL (кошуу/өзгөртүү) -->
+<div id="formModal" class="modal">
+    <div class="modal-box">
+        <h3 id="modalTitle">Кошуу</h3>
+        <div id="modalFields"></div>
+        <div class="modal-actions">
+            <button class="save-btn" onclick="saveItem()">Сактоо</button>
+            <button class="cancel-btn" onclick="closeModal()">Жокко чыгаруу</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const API = window.location.origin + '/api';
+let token = localStorage.getItem('adminToken');
+let currentType = null;
+let currentEditId = null;
+
+// ===== LOGIN =====
+if (token) {
+    verifyToken();
+} else {
+    showLogin();
+}
+
+function showLogin() {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('adminPanel').style.display = 'none';
+}
+
+function showPanel() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    loadAll();
+}
+
+async function verifyToken() {
+    try {
+        const res = await fetch(`${API}/admin/verify`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) { showPanel(); } else { localStorage.removeItem('adminToken'); showLogin(); }
+    } catch (e) { showLogin(); }
+}
+
+async function login() {
+    const password = document.getElementById('passwordInput').value;
+    const errorEl = document.getElementById('loginError');
+    errorEl.textContent = '';
+
+    try {
+        const res = await fetch(`${API}/admin/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+            errorEl.textContent = data.error || 'Ката кетти';
+            return;
+        }
+
+        token = data.token;
+        localStorage.setItem('adminToken', token);
+        showPanel();
+    } catch (e) {
+        errorEl.textContent = 'Сервер менен байланыш үзүлдү';
+    }
+}
+
+function logout() {
+    localStorage.removeItem('adminToken');
+    token = null;
+    showLogin();
+}
+
+// ===== TABS =====
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabName).classList.add('active');
+    event.target.classList.add('active');
+}
+
+// ===== LOAD DATA =====
+function loadAll() {
+    loadSubmissions();
+    loadPrograms();
+    loadTeachers();
+    loadNews();
+}
+
+async function loadSubmissions() {
+    const res = await fetch(`${API}/submissions`, { headers: authHeader() });
+    const data = await res.json();
+    const rows = (data.data || data || []).map(s => `
+        <tr>
+            <td>${s.fullName}</td>
+            <td>${s.age}</td>
+            <td>${s.phone}</td>
+            <td>${s.program}</td>
+            <td class="status-${s.status}">${s.status}</td>
+            <td>
+                <button class="btn btn-edit" onclick="updateStatus('${s.id}','approved')">Кабыл алуу</button>
+                <button class="btn btn-delete" onclick="updateStatus('${s.id}','rejected')">Четке кагуу</button>
+            </td>
+        </tr>
+    `).join('');
+    document.getElementById('submissionsTable').innerHTML = rows || '<tr><td colspan="6">Арыздар жок</td></tr>';
+}
+
+async function updateStatus(id, status) {
+    await fetch(`${API}/submissions/${id}/status`, {
+        method: 'PATCH',
+        headers: { ...authHeader(), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+    });
+    loadSubmissions();
+}
+
+async function loadPrograms() {
+    const res = await fetch(`${API}/programs`);
+    const data = await res.json();
+    const items = data.data || data || [];
+    document.getElementById('programsTable').innerHTML = items.map(p => `
+        <tr>
+            <td>${p.name}</td>
+            <td>${p.duration || ''}</td>
+            <td>${(p.description || '').substring(0, 40)}...</td>
+            <td>
+                <button class="btn btn-edit" onclick='editItem("programs", ${JSON.stringify(p)})'>Өзгөртүү</button>
+                <button class="btn btn-delete" onclick="deleteItem('programs','${p.id}')">Өчүрүү</button>
+            </td>
+        </tr>
+    `).join('') || '<tr><td colspan="4">Программа жок</td></tr>';
+}
+
+async function loadTeachers() {
+    const res = await fetch(`${API}/teachers`);
+    const data = await res.json();
+    const items = data.data || data || [];
+    document.getElementById('teachersTable').innerHTML = items.map(t => `
+        <tr>
+            <td>${t.name}</td>
+            <td>${t.specialty}</td>
+            <td>
+                <button class="btn btn-edit" onclick='editItem("teachers", ${JSON.stringify(t)})'>Өзгөртүү</button>
+                <button class="btn btn-delete" onclick="deleteItem('teachers','${t.id}')">Өчүрүү</button>
+            </td>
+        </tr>
+    `).join('') || '<tr><td colspan="3">Устаз жок</td></tr>';
+}
+
+async function loadNews() {
+    const res = await fetch(`${API}/news`);
+    const data = await res.json();
+    const items = data.data || data || [];
+    document.getElementById('newsTable').innerHTML = items.map(n => `
+        <tr>
+            <td>${n.title}</td>
+            <td>${n.category || ''}</td>
+            <td>
+                <button class="btn btn-edit" onclick='editItem("news", ${JSON.stringify(n)})'>Өзгөртүү</button>
+                <button class="btn btn-delete" onclick="deleteItem('news','${n.id}')">Өчүрүү</button>
+            </td>
+        </tr>
+    `).join('') || '<tr><td colspan="3">Жаңылык жок</td></tr>';
+}
+
+async function deleteItem(type, id) {
+    if (!confirm('Чын эле өчүрөсүзбү?')) return;
+    await fetch(`${API}/${type}/${id}`, { method: 'DELETE', headers: authHeader() });
+    if (type === 'programs') loadPrograms();
+    if (type === 'teachers') loadTeachers();
+    if (type === 'news') loadNews();
+}
+
+// ===== MODAL (кошуу/өзгөртүү форма) =====
+const fieldsConfig = {
+    programs: [
+        { key: 'name', label: 'Аты' },
+        { key: 'description', label: 'Сүрөттөмө', type: 'textarea' },
+        { key: 'icon', label: 'Иконка (эмодзи)' },
+        { key: 'duration', label: 'Мөөнөтү' }
+    ],
+    teachers: [
+        { key: 'name', label: 'Аты' },
+        { key: 'specialty', label: 'Адистиги' },
+        { key: 'bio', label: 'Био', type: 'textarea' },
+        { key: 'rating', label: 'Рейтинг (1-5)' },
+        { key: 'avatar', label: 'Аватар (эмодзи же URL)' }
+    ],
+        news: [
+        { key: 'title', label: 'Аталышы' },
+        { key: 'content', label: 'Мазмуну', type: 'textarea' },
+        { key: 'category', label: 'Категория' },
+        { key: 'date', label: 'Дата', type: 'date' },
+        { key: 'image', label: 'Сүрөт (URL шилтеме)' }
+    ]
+};
+
+function openModal(type) {
+    currentType = type;
+    currentEditId = null;
+    document.getElementById('modalTitle').textContent = 'Жаңы кошуу';
+    renderFields(type, {});
+    document.getElementById('formModal').classList.add('active');
+}
+
+function editItem(type, item) {
+    currentType = type;
+    currentEditId = item.id;
+    document.getElementById('modalTitle').textContent = 'Өзгөртүү';
+    renderFields(type, item);
+    document.getElementById('formModal').classList.add('active');
+}
+
+function renderFields(type, item) {
+    const fields = fieldsConfig[type];
+    document.getElementById('modalFields').innerHTML = fields.map(f => {
+        const value = item[f.key] || '';
+        if (f.type === 'textarea') {
+            return `<textarea id="field_${f.key}" placeholder="${f.label}" rows="3">${value}</textarea>`;
+        }
+        if (f.type === 'date') {
+            const dateValue = value ? value.substring(0, 10) : new Date().toISOString().substring(0, 10);
+            return `<label style="font-size:13px;color:#666;">${f.label}</label><input type="date" id="field_${f.key}" value="${dateValue}">`;
+        }
+        if (f.key === 'image') {
+            return `
+                <label style="font-size:13px;color:#666;">${f.label}</label>
+                <input type="file" id="field_${f.key}_file" accept="image/*" onchange="uploadImage(this)">
+                <input type="hidden" id="field_${f.key}" value="${value}">
+                <div id="imagePreview">${value ? `<img src="${value}" style="max-width:100%;margin-top:8px;border-radius:6px;">` : ''}</div>
+            `;
+        }
+        return `<input id="field_${f.key}" placeholder="${f.label}" value="${value}">`;
+    }).join('');
+}
+
+async function uploadImage(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const preview = document.getElementById('imagePreview');
+    preview.innerHTML = 'Жүктөлүүдө...';
+
+    try {
+        const res = await fetch(`${API}/upload`, {
+            method: 'POST',
+            headers: authHeader(),
+            body: formData
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+            preview.innerHTML = `<span style="color:red;">${data.error}</span>`;
+            return;
+        }
+
+        document.getElementById('field_image').value = data.url;
+        preview.innerHTML = `<img src="${data.url}" style="max-width:100%;margin-top:8px;border-radius:6px;">`;
+    } catch (e) {
+        preview.innerHTML = '<span style="color:red;">Жүктөөдө ката кетти</span>';
+    }
+}
+
+function closeModal() {
+    document.getElementById('formModal').classList.remove('active');
+}
+
+async function saveItem() {
+    const fields = fieldsConfig[currentType];
+    const body = {};
+    fields.forEach(f => {
+        body[f.key] = document.getElementById(`field_${f.key}`).value;
+    });
+
+    const url = currentEditId ? `${API}/${currentType}/${currentEditId}` : `${API}/${currentType}`;
+    const method = currentEditId ? 'PUT' : 'POST';
+
+    await fetch(url, {
+        method,
+        headers: { ...authHeader(), 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+    });
+
+    closeModal();
+    if (currentType === 'programs') loadPrograms();
+    if (currentType === 'teachers') loadTeachers();
+    if (currentType === 'news') loadNews();
+}
+
+function authHeader() {
+    return { 'Authorization': `Bearer ${token}` };
+}
+</script>
+</body>
+</html>
